@@ -1,2 +1,6 @@
 # mrcs-cli
-Command-line interface for the model rail control systems (MRCS) APIs
+_Command-line interface for the Model Rail Control Systems (MRCS) APIs_
+
+---
+
+requires **[mrcs-core](https://github.com/modelrailcontrolsystems/mrcs-core)**
