@@ -5,7 +5,7 @@ Created on 6 Dec 2025
 
 @author: Bruno Beloff (bbeloff@me.com)
 
-source repo: mrcs_web
+source repo: mrcs_cli
 
 DESCRIPTION
 Configure the MRCS local web server base URL
