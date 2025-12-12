@@ -11,7 +11,7 @@ DESCRIPTION
 Configure the MRCS local web server base URL
 
 SYNOPSIS
-mrcs_server [-h] [-t] [-i INDENT] [-v] [--version] [-s HOST PORT IS_SECURE]
+mrcs_server [-h] [-i INDENT] [-v] [--version] [-s HOST PORT IS_SECURE]
 
 EXAMPLES
 mrcs_server -v -i4 -s 127.0.0.1 8080 0

@@ -6,12 +6,12 @@ Created on 6 Dec 2025
 https://realpython.com/command-line-interfaces-python-argparse/
 """
 
-from mrcs_core.cli.args.mrcs_args import MRCSArgs
+from mrcs_cli.cli.args.cli_args import CLIArgs
 
 
 # --------------------------------------------------------------------------------------------------------------------
 
-class ServerArgs(MRCSArgs):
+class ServerArgs(CLIArgs):
     """unix command line handler"""
 
     def __init__(self, description):
@@ -63,4 +63,4 @@ class ServerArgs(MRCSArgs):
     # ----------------------------------------------------------------------------------------------------------------
 
     def __str__(self, *args, **kwargs):
-        return f'ServerArgs:{{test:{self.test}, set:{self._args.set}, indent:{self.indent}, verbose:{self.verbose}}}'
+        return f'ServerArgs:{{set:{self._args.set}, indent:{self.indent}, verbose:{self.verbose}}}'
