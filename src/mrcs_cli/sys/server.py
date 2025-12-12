@@ -66,6 +66,10 @@ class Server(PersistentJSONable):
         return scheme + '://' + self.host + port + '/'
 
 
+    def url(self, path):
+        return self.base_url() + path
+
+
     # ----------------------------------------------------------------------------------------------------------------
 
     def as_json(self, **kwargs):
