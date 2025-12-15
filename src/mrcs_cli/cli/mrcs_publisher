@@ -20,12 +20,12 @@ EXAMPLES
 mrcs_publisher -v -t MPU -b 1 -n 2
 """
 
+import httpx
 import json
 import sys
 
+from http.client import HTTPException
 from json import JSONDecodeError
-
-import httpx
 
 from mrcs_cli.cli.args.publisher_args import PublisherArgs
 from mrcs_cli.sys.server import Server
@@ -52,10 +52,11 @@ def publish_message(body):
 
     try:
         response = httpx.post(endpoint, json=JSONify.as_jdict(message))
-        logger.info(f'response: {response.status_code}')
+        if response.status_code != 200:
+            raise HTTPException(f'{response.status_code}:{response.reason_phrase}')
 
     except Exception as ex:
-        logger.error(ex)
+        logger.error(f'{ex.__class__.__name__}: {ex}')
         exit(1)
 
 
@@ -85,8 +86,6 @@ if __name__ == '__main__':
     except ValueError as ve:
         logger.error(ve)
         exit(2)
-
-    logger.info(f'target: {target}')
 
 
     # ----------------------------------------------------------------------------------------------------------------
