@@ -13,11 +13,10 @@ Message bodies are read from stdin or from the --message argument. Messages are 
 routing specified by command-line arguments.
 
 SYNOPSIS
-mrcs_publisher [-h] [-i INDENT] [-v] [--version] [-s SOURCE_SERIAL]
-[-t TARGET_TYPE] [-b TARGET_BLOCK] [-n TARGET_SERIAL] [-m MESSAGE_BODY]
+mrcs_session [-h] [-i INDENT] [-v] [--version] (-e SET_EMAIL | -r REMOVE_EMAIL | -c CREATE | -d DELETE)
 
 EXAMPLES
-mrcs_publisher -v -t MPU -b 1 -n 2
+
 """
 
 import httpx
@@ -27,7 +26,8 @@ import sys
 from http.client import HTTPException
 from json import JSONDecodeError
 
-from mrcs_cli.cli.args.publisher_args import PublisherArgs
+from mrcs_cli.cli.args.session_args import SessionArgs
+from mrcs_cli.conf.credentials import Credentials
 from mrcs_cli.conf.server import Server
 
 from mrcs_core.data.datum import Datum
@@ -37,28 +37,10 @@ from mrcs_core.messaging.message import Message
 from mrcs_core.messaging.routing_key import PublicationRoutingKey
 from mrcs_core.sys.host import Host
 from mrcs_core.sys.logging import Logging
+from mrcs_core.sys.stdio import StdIO
 
 
-# --------------------------------------------------------------------------------------------------------------------
-
-def publish_message(body):
-    try:
-        message = Message(routing_key, json.loads(body))
-        logger.info(JSONify.as_jdict(message, indent=args.indent))
-
-    except JSONDecodeError as jde:
-        logger.error(f'{jde.__class__.__name__}: {body}')
-        exit(2)
-
-    try:
-        response = httpx.post(endpoint, json=JSONify.as_jdict(message))
-        if response.status_code != 200:
-            raise HTTPException(f'{response.status_code}:{response.reason_phrase}')
-
-    except Exception as ex:
-        logger.error(f'{ex.__class__.__name__}: {ex}')
-        exit(1)
-
+# TODO: maybe have a non-interactive mode, in which the credentials are provided on stdin?
 
 # --------------------------------------------------------------------------------------------------------------------
 
@@ -66,9 +48,9 @@ if __name__ == '__main__':
 
     # ----------------------------------------------------------------------------------------------------------------
 
-    args = PublisherArgs('a tool for publishing messages via the MRCS API')
+    args = SessionArgs('a tool for managing MRCS API sessions')
 
-    Logging.config('mrcs_publisher', verbose=args.verbose)
+    Logging.config('mrcs_session', verbose=args.verbose)
     logger = Logging.getLogger()
     logger.info(f'args: {args}')
 
@@ -78,28 +60,43 @@ if __name__ == '__main__':
         logger.error('server not configured.')
         exit(1)
 
-    endpoint = server.url('tst/publish')
+    endpoint = server.url('session')
     logger.info(f'endpoint: {endpoint}')
-
-    try:
-        target = EquipmentFilter.construct(args.target_type, args.target_block, args.target_serial)
-    except ValueError as ve:
-        logger.error(ve)
-        exit(2)
 
 
     # ----------------------------------------------------------------------------------------------------------------
 
     try:
-        source = EquipmentIdentifier(EquipmentType.TST, None, args.source_serial)
-        routing_key = PublicationRoutingKey(source, target)
+        if args.set_email:
+            # TODO: test whether email is valid
+            credentials = Credentials(args.set_email, None)
+            credentials.save(Host)
+            exit(0)
 
-        if args.message_body:
-            publish_message(args.message_body)
+        if args.erase_email:
+            Credentials.delete(Host)
+            exit(0)
 
-        else:
-            for message_body in Datum.effective_lines(sys.stdin):
-                publish_message(message_body)
+        if args.create:
+            credentials = Credentials.load(Host)
+            username = credentials.username if credentials else None
+
+            username = StdIO.prompt('username', default=username)
+            password = StdIO.password('password')
+
+            form = Credentials(username, password).as_form()
+
+            try:
+                response = httpx.post(endpoint, data=form)
+                print(f'response: {response.content}')
+                if response.status_code != 201:
+                    raise HTTPException(f'{response.status_code}:{response.reason_phrase}')
+
+                # TODO: save token
+
+            except Exception as ex:
+                logger.error(f'{ex.__class__.__name__}: {ex}')
+                exit(1)
 
 
     # ----------------------------------------------------------------------------------------------------------------
