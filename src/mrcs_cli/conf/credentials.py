@@ -56,7 +56,7 @@ class Credentials(PersistentJSONable):
 
     # ----------------------------------------------------------------------------------------------------------------
 
-    def as_form(self, **kwargs):
+    def as_form(self):
         jdict = OrderedDict()
 
         jdict['grant_type'] = 'password'
