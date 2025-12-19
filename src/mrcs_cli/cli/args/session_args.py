@@ -25,10 +25,10 @@ class SessionArgs(CLIArgs):
         group.add_argument('-e', '--erase-email', action='store_true',
                            help='erase the stored email address')
 
-        group.add_argument('-c', '--create', action='store_true',
+        group.add_argument('-c', '--create-session', action='store_true',
                            help='create a new API session')
 
-        group.add_argument('-d', '--delete', action='store_true',
+        group.add_argument('-d', '--delete-session', action='store_true',
                            help='delete the current API session')
 
         self._args = self._parser.parse_args()
@@ -47,17 +47,18 @@ class SessionArgs(CLIArgs):
 
 
     @property
-    def create(self):
-        return self._args.create
+    def create_session(self):
+        return self._args.create_session
 
 
     @property
-    def delete(self):
-        return self._args.delete
+    def delete_session(self):
+        return self._args.delete_session
 
 
     # ----------------------------------------------------------------------------------------------------------------
 
     def __str__(self, *args, **kwargs):
         return (f'SessionArgs:{{set_email:{self.set_email}, erase_email:{self.erase_email}, '
-                f'create:{self.create}, delete:{self.delete}, indent:{self.indent}, verbose:{self.verbose}}}')
+                f'create:{self.create_session}, delete:{self.delete_session}, '
+                f'indent:{self.indent}, verbose:{self.verbose}}}')
