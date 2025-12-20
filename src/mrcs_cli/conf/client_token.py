@@ -4,8 +4,6 @@ Created on 19 Dec 2025
 @author: Bruno Beloff (bbeloff@me.com)
 
 A JSON Web Token (JWT) carrying scopes
-
-https://fastapi.tiangolo.com/advanced/security/oauth2-scopes/#verify-the-scopes
 """
 
 from collections import OrderedDict
@@ -32,7 +30,7 @@ class ClientJWT(JWT, PersistentJSONable):
     # ----------------------------------------------------------------------------------------------------------------
 
     @classmethod
-    def construct_from_jdict(cls, jdict):
+    def construct_from_jdict(cls, jdict, skeleton=False):
         if not jdict:
             return None
 
@@ -40,7 +38,6 @@ class ClientJWT(JWT, PersistentJSONable):
         token_type = jdict.get('token_type')
 
         return cls(access, token_type)
-
 
     # ----------------------------------------------------------------------------------------------------------------
 
@@ -57,3 +54,9 @@ class ClientJWT(JWT, PersistentJSONable):
         jdict['token_type'] = self.token_type
 
         return jdict
+
+
+    # ----------------------------------------------------------------------------------------------------------------
+
+    def __str__(self, *args, **kwargs):
+        return f'ClientJWT:{{token_type:{self.token_type}, access:{self.access.data}}}'
