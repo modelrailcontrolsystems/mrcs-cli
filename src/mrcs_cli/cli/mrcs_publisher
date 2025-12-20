@@ -8,9 +8,12 @@ Created on 11 Dec 2025
 source repo: mrcs_cli
 
 DESCRIPTION
-A tool for publishing messages.
+A tool for publishing messages via the MRCS API.
 Message bodies are read from stdin or from the --message argument. Messages are published with source and target
 routing specified by command-line arguments.
+
+A session must have been established with the API server, using the mrcs_session utility.
+A 401 response typically indicates that the session token has expired.
 
 SYNOPSIS
 mrcs_publisher [-h] [-i INDENT] [-v] [--version] [-s SOURCE_SERIAL]
@@ -18,17 +21,21 @@ mrcs_publisher [-h] [-i INDENT] [-v] [--version] [-s SOURCE_SERIAL]
 
 EXAMPLES
 mrcs_publisher -v -t MPU -b 1 -n 2
+
+SEE ALSO
+mrcs_session
 """
 
 import httpx
 import json
 import sys
 
-from http.client import HTTPException
 from json import JSONDecodeError
 
 from mrcs_cli.cli.args.publisher_args import PublisherArgs
+from mrcs_cli.conf.client_token import ClientJWT
 from mrcs_cli.conf.server import Server
+from mrcs_cli.exceptions import HTTPResponseException
 
 from mrcs_core.data.datum import Datum
 from mrcs_core.data.equipment_identity import EquipmentType, EquipmentIdentifier, EquipmentFilter
@@ -51,12 +58,11 @@ def publish_message(body):
         exit(2)
 
     try:
-        response = httpx.post(endpoint, json=JSONify.as_jdict(message))
-        if response.status_code != 200:
-            raise HTTPException(f'{response.status_code}:{response.reason_phrase}')
+        response = httpx.post(endpoint, headers=token.as_header(), json=JSONify.as_jdict(message))
+        HTTPResponseException.check(response, 201)
 
-    except Exception as ex:
-        logger.error(f'{ex.__class__.__name__}: {ex}')
+    except HTTPResponseException as ex:
+        logger.error(ex)
         exit(1)
 
 
@@ -73,7 +79,6 @@ if __name__ == '__main__':
     logger.info(f'args: {args}')
 
     server = Server.load(Host)
-
     if not server:
         logger.error('server not configured.')
         exit(1)
@@ -81,12 +86,16 @@ if __name__ == '__main__':
     endpoint = server.url('tst/publish')
     logger.info(f'endpoint: {endpoint}')
 
+    token = ClientJWT.load(Host)
+    if not token:
+        logger.error('security token not configured - use mrcs_session to create one.')
+        exit(1)
+
     try:
         target = EquipmentFilter.construct(args.target_type, args.target_block, args.target_serial)
     except ValueError as ve:
         logger.error(ve)
         exit(2)
-
 
     # ----------------------------------------------------------------------------------------------------------------
 
@@ -100,7 +109,6 @@ if __name__ == '__main__':
         else:
             for message_body in Datum.effective_lines(sys.stdin):
                 publish_message(message_body)
-
 
     # ----------------------------------------------------------------------------------------------------------------
 

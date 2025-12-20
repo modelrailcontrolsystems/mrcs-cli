@@ -8,38 +8,40 @@ Created on 18 Dec 2025
 source repo: mrcs_cli
 
 DESCRIPTION
-A tool for managing MRCS API sessions.
+A tool for managing security tokens for MRCS API sessions.
+A username (email address) can be set for use in creating sessions.
+The password must be given interactively when the session is created.
 
 SYNOPSIS
 mrcs_session [-h] [-i INDENT] [-v] [--version] (-s SET_EMAIL | -e | -c | -d)
 
 EXAMPLES
-
+mrcs_session -s bbeloff1@me.com
+mrcs_session -c
 """
 
 import httpx
 import sys
 
-from http.client import HTTPException
-
 from mrcs_cli.cli.args.session_args import SessionArgs
 from mrcs_cli.conf.client_token import ClientJWT
 from mrcs_cli.conf.credentials import Credentials
 from mrcs_cli.conf.server import Server
+from mrcs_cli.exceptions import HTTPResponseException
 
+from mrcs_core.data.datum import Datum
 from mrcs_core.sys.host import Host
 from mrcs_core.sys.logging import Logging
 from mrcs_core.sys.stdio import StdIO
 
 
-# TODO: maybe have a non-interactive mode, in which the credentials are provided on stdin?
 # --------------------------------------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
 
     # ----------------------------------------------------------------------------------------------------------------
 
-    args = SessionArgs('a tool for managing MRCS API sessions')
+    args = SessionArgs('a tool for managing security tokens for MRCS API sessions')
 
     Logging.config('mrcs_session', verbose=args.verbose)
     logger = Logging.getLogger()
@@ -54,12 +56,14 @@ if __name__ == '__main__':
     endpoint = server.url('session')
     logger.info(f'endpoint: {endpoint}')
 
-
     # ----------------------------------------------------------------------------------------------------------------
 
     try:
         if args.set_email:
-            # TODO: test whether email is valid
+            if not Datum.is_email_address(args.set_email):
+                logger.error(f'the email address {args.set_email} is not valid.')
+                exit(2)
+
             credentials = Credentials(args.set_email, None)
             credentials.save(Host)
             exit(0)
@@ -79,20 +83,24 @@ if __name__ == '__main__':
 
             try:
                 response = httpx.post(endpoint, data=form)
-                if response.status_code != 201:
-                    raise HTTPException(f'{response.status_code}:{response.reason_phrase}')
+                HTTPResponseException.check(response, 201)
 
                 token = ClientJWT.construct_from_jdict(response.json())
                 token.save(Host)
-
-                logger.info(f'token:{token}')
+                exit(0)
 
             except Exception as ex:
                 logger.error(f'{ex.__class__.__name__}: {ex}')
                 exit(1)
 
+        if args.delete_session:
+            ClientJWT.delete(Host)
+            exit(0)
 
     # ----------------------------------------------------------------------------------------------------------------
+
+    except HTTPResponseException as ex:
+        logger.error(ex)
 
     except KeyboardInterrupt:
         print(file=sys.stderr)
