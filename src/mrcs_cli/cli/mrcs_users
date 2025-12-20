@@ -1,0 +1,96 @@
+#!/usr/bin/env python3
+
+"""
+Created on 20 Dec 2025
+
+@author: Bruno Beloff (bbeloff@me.com)
+
+source repo: mrcs_cli
+
+DESCRIPTION
+A tool for managing users via the MRCS API.
+
+A session must have been established with the API server, using the mrcs_session utility.
+A 401 response typically indicates that the session token has expired.
+
+SYNOPSIS
+mrcs_publisher [-h] [-i INDENT] [-v] [--version] [-s SOURCE_SERIAL]
+[-t TARGET_TYPE] [-b TARGET_BLOCK] [-n TARGET_SERIAL] [-m MESSAGE_BODY]
+
+EXAMPLES
+mrcs_publisher -v -t MPU -b 1 -n 2
+
+SEE ALSO
+mrcs_session
+"""
+
+import httpx
+import sys
+
+from mrcs_cli.cli.args.users_args import UsersArgs
+from mrcs_cli.conf.client_token import ClientJWT
+from mrcs_cli.conf.server import Server
+from mrcs_cli.exceptions import HTTPResponseException
+
+from mrcs_core.admin.user.user import User
+from mrcs_core.data.json import JSONify
+from mrcs_core.sys.host import Host
+from mrcs_core.sys.logging import Logging
+
+
+# --------------------------------------------------------------------------------------------------------------------
+
+if __name__ == '__main__':
+
+    # ----------------------------------------------------------------------------------------------------------------
+
+    args = UsersArgs('a tool for managing users via the MRCS API')
+
+    Logging.config('mrcs_users', verbose=args.verbose)
+    logger = Logging.getLogger()
+    logger.info(f'args: {args}')
+
+    server = Server.load(Host)
+    if not server:
+        logger.error('server not configured.')
+        exit(1)
+
+    endpoint = server.url('user')
+    logger.info(f'endpoint: {endpoint}')
+
+    token = ClientJWT.load(Host)
+    if not token:
+        logger.error('security token not configured - use mrcs_session to create one.')
+        exit(1)
+
+    # ----------------------------------------------------------------------------------------------------------------
+
+    try:
+        if args.self:
+            response = httpx.get(f'{endpoint}/self', headers=token.as_header())
+            HTTPResponseException.check(response, 200)
+
+            user = User.construct_from_jdict(response.json())
+            print(JSONify.dumps(user, indent=args.indent))
+            exit(0)
+
+        if args.list:
+            response = httpx.get(f'{endpoint}/find_al', headers=token.as_header())
+            HTTPResponseException.check(response, 200)
+
+            users = [User.construct_from_jdict(jdict) for jdict in response.json()]
+            print(JSONify.dumps(users, indent=args.indent))
+            exit(0)
+
+        if args.delete:
+            response = httpx.delete(f'{endpoint}/delete/{args.delete}', headers=token.as_header())
+            HTTPResponseException.check(response, 200)
+            exit(0)
+
+    # ----------------------------------------------------------------------------------------------------------------
+
+    except HTTPResponseException as ex:
+        logger.error(ex)
+
+    except KeyboardInterrupt:
+        print(file=sys.stderr)

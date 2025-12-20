@@ -4,7 +4,6 @@ Created on 22 Nov 2025
 @author: Bruno Beloff (bbeloff@me.com)
 
 https://realpython.com/command-line-interfaces-python-argparse/
-https://stackoverflow.com/questions/34988908/argparse-with-two-values-for-one-argument
 """
 
 from mrcs_cli.cli.args.cli_args import CLIArgs

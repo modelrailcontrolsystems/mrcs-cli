@@ -23,14 +23,13 @@ mrcs_session -c
 import httpx
 import sys
 
-from http.client import HTTPException
-
 from mrcs_cli.cli.args.session_args import SessionArgs
 from mrcs_cli.conf.client_token import ClientJWT
 from mrcs_cli.conf.credentials import Credentials
 from mrcs_cli.conf.server import Server
-from mrcs_core.data.datum import Datum
+from mrcs_cli.exceptions import HTTPResponseException
 
+from mrcs_core.data.datum import Datum
 from mrcs_core.sys.host import Host
 from mrcs_core.sys.logging import Logging
 from mrcs_core.sys.stdio import StdIO
@@ -56,7 +55,6 @@ if __name__ == '__main__':
 
     endpoint = server.url('session')
     logger.info(f'endpoint: {endpoint}')
-
 
     # ----------------------------------------------------------------------------------------------------------------
 
@@ -85,8 +83,7 @@ if __name__ == '__main__':
 
             try:
                 response = httpx.post(endpoint, data=form)
-                if response.status_code != 201:
-                    raise HTTPException(f'{response.status_code}:{response.reason_phrase}')
+                HTTPResponseException.check(response, 201)
 
                 token = ClientJWT.construct_from_jdict(response.json())
                 token.save(Host)
@@ -101,6 +98,9 @@ if __name__ == '__main__':
             exit(0)
 
     # ----------------------------------------------------------------------------------------------------------------
+
+    except HTTPResponseException as ex:
+        logger.error(ex)
 
     except KeyboardInterrupt:
         print(file=sys.stderr)
