@@ -75,7 +75,7 @@ if __name__ == '__main__':
             exit(0)
 
         if args.list:
-            response = httpx.get(f'{endpoint}/find_al', headers=token.as_header())
+            response = httpx.get(f'{endpoint}/find_all', headers=token.as_header())
             HTTPResponseException.check(response, 200)
 
             users = [User.construct_from_jdict(jdict) for jdict in response.json()]
