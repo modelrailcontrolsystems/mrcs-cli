@@ -8,17 +8,16 @@ Created on 20 Dec 2025
 source repo: mrcs_cli
 
 DESCRIPTION
-A tool for listing logged messages via the MRCS API.
+A tool for listing the latest N logged messages via the MRCS API.
 
 A session must have been established with the API server, using the mrcs_session utility.
 A 401 response typically indicates that the session token has expired.
 
 SYNOPSIS
-mrcs_publisher [-h] [-i INDENT] [-v] [--version] [-s SOURCE_SERIAL]
-[-t TARGET_TYPE] [-b TARGET_BLOCK] [-n TARGET_SERIAL] [-m MESSAGE_BODY]
+mrcs_messages [-h] [-i INDENT] [-v] [--version] -l LIST
 
 EXAMPLES
-mrcs_publisher -v -t MPU -b 1 -n 2
+mrcs_messages -vi4 -l 10
 
 SEE ALSO
 mrcs_session
