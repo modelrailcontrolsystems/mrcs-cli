@@ -45,7 +45,7 @@ if __name__ == '__main__':
 
     args = MessagesArgs('a tool for listing logged messages via the MRCS API')
 
-    Logging.config('mrcs_users', verbose=args.verbose)
+    Logging.config('mrcs_messages', verbose=args.verbose)
     logger = Logging.getLogger()
     logger.info(f'args: {args}')
 
