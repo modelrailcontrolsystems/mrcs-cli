@@ -88,6 +88,9 @@ if __name__ == '__main__':
 
     # ----------------------------------------------------------------------------------------------------------------
 
+    except httpx.ConnectError as ce:
+        logger.error(f'{ce} - is the API server running?')
+
     except HTTPResponseException as ex:
         logger.error(ex)
 
