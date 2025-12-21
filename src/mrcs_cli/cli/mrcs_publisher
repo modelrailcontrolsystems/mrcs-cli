@@ -112,5 +112,8 @@ if __name__ == '__main__':
 
     # ----------------------------------------------------------------------------------------------------------------
 
+    except httpx.ConnectError as ce:
+        logger.error(f'{ce} - is the API server running?')
+
     except KeyboardInterrupt:
         print(file=sys.stderr)

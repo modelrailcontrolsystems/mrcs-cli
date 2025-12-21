@@ -89,6 +89,9 @@ if __name__ == '__main__':
                 token.save(Host)
                 exit(0)
 
+            except httpx.ConnectError as ce:
+                logger.error(f'{ce} - is the API server running?')
+
             except Exception as ex:
                 logger.error(f'{ex.__class__.__name__}: {ex}')
                 exit(1)
@@ -98,9 +101,6 @@ if __name__ == '__main__':
             exit(0)
 
     # ----------------------------------------------------------------------------------------------------------------
-
-    except HTTPResponseException as ex:
-        logger.error(ex)
 
     except KeyboardInterrupt:
         print(file=sys.stderr)
