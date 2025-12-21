@@ -63,7 +63,7 @@ class Server(PersistentJSONable):
         scheme = 'https' if self.is_secure else 'http'
         port = '' if self.port == 80 else ':' + str(self.__port)
 
-        return scheme + '://' + self.host + port + '/'
+        return f'{scheme}://{self.host}{port}/'
 
 
     def url(self, path):
