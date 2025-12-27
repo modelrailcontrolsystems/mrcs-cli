@@ -59,7 +59,7 @@ if __name__ == '__main__':
 
     token = ClientJWT.load(Host)
     if not token:
-        logger.error('security token not configured - use mrcs_session to create one.')
+        logger.error('security token not set - use mrcs_session to create one.')
         exit(1)
 
     # ----------------------------------------------------------------------------------------------------------------
