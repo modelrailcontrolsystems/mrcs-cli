@@ -1,23 +1,29 @@
 #!/usr/bin/env python3
 
 """
-Created on 20 Dec 2025
+Created on 26 Dec 2025
 
 @author: Bruno Beloff (bbeloff@me.com)
 
 source repo: mrcs_cli
 
 DESCRIPTION
-A tool for managing users via the MRCS API.
+A tool for managing model time.
+* Clock speed is a simple multiplier, a value of 1 indicates that the clock will run at natural speed
+* Any combination of time offsets can be used - the default value for each is the current datetime
+* Deleting the clock configuration will return the clock to natural time
+The timezone of model time is the same timezone as the host processor.
 
 A session must have been established with the API server, using the mrcs_session utility.
 A 401 response typically indicates that the session token has expired.
 
 SYNOPSIS
-mrcs_users [-h] [-i INDENT] [-v] [--version] (-s | -l | -d DELETE)
+mrcs_time [-h] [-i INDENT] [-v] [--version] (-n | -c | -s | -r | -d)
+[-ss SPEED] [-sy YEAR] [-sm MONTH] [-sd DAY] [-sh HOUR] [-si MINUTE]
 
 EXAMPLES
-mrcs_users -v -l -i4
+mrcs_time -s -ss 4 -sy 1934 -sm 1 -sd 1 -sh 6 -si 0 -v
+mrcs_time -n
 
 SEE ALSO
 mrcs_session
@@ -26,12 +32,11 @@ mrcs_session
 import httpx
 import sys
 
-from mrcs_cli.cli.args.users_args import UsersArgs
+from mrcs_cli.cli.args.time_args import TimeArgs
 from mrcs_cli.conf.client_token import ClientJWT
 from mrcs_cli.conf.server import Server
 from mrcs_cli.exceptions import HTTPResponseException
 
-from mrcs_core.admin.user.user import User
 from mrcs_core.data.json import JSONify
 from mrcs_core.sys.host import Host
 from mrcs_core.sys.logging import Logging
@@ -43,18 +48,19 @@ if __name__ == '__main__':
 
     # ----------------------------------------------------------------------------------------------------------------
 
-    args = UsersArgs('a tool for managing users via the MRCS API')
+    args = TimeArgs('a tool for managing model time')
 
-    Logging.config('mrcs_users', verbose=args.verbose)
+    Logging.config('mrcs_time', verbose=args.verbose)
     logger = Logging.getLogger()
     logger.info(f'args: {args}')
 
     server = Server.load(Host)
+
     if not server:
         logger.error('server not configured.')
         exit(1)
 
-    endpoint = server.url('user')
+    endpoint = server.url('time')
     logger.info(f'endpoint: {endpoint}')
 
     token = ClientJWT.load(Host)
@@ -65,25 +71,39 @@ if __name__ == '__main__':
     # ----------------------------------------------------------------------------------------------------------------
 
     try:
-        if args.self:
-            response = httpx.get(f'{endpoint}/self', headers=token.as_header())
+        if args.now:
+            response = httpx.get(f'{endpoint}/now')
             HTTPResponseException.check(response, 200)
 
-            user = User.construct_from_jdict(response.json())
-            print(JSONify.dumps(user, indent=args.indent))
+            print(JSONify.dumps(response.json()))
             exit(0)
 
-        if args.list:
-            response = httpx.get(f'{endpoint}/find_all', headers=token.as_header())
+        if args.conf:
+            response = httpx.get(f'{endpoint}/conf')
             HTTPResponseException.check(response, 200)
 
-            users = [User.construct_from_jdict(jdict) for jdict in response.json()]
-            print(JSONify.dumps(users, indent=args.indent))
+            print(JSONify.dumps(response.json()))
+            exit(0)
+
+        if args.set:
+            response = httpx.put(f'{endpoint}/set', headers=token.as_header(), json=args.clock_set())
+            HTTPResponseException.check(response, 200)
+
+            print(JSONify.dumps(response.json()))
+            exit(0)
+
+        if args.restart:
+            response = httpx.patch(f'{endpoint}/restart', headers=token.as_header())
+            HTTPResponseException.check(response, 200)
+
+            print(JSONify.dumps(response.json()))
             exit(0)
 
         if args.delete:
-            response = httpx.delete(f'{endpoint}/delete/{args.delete}', headers=token.as_header())
+            response = httpx.delete(f'{endpoint}/delete', headers=token.as_header())
             HTTPResponseException.check(response, 200)
+
+            print(JSONify.dumps(response.json()))
             exit(0)
 
     # ----------------------------------------------------------------------------------------------------------------
