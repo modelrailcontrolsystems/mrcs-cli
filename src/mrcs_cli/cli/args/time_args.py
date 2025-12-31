@@ -10,7 +10,7 @@ from collections import OrderedDict
 
 from mrcs_cli.cli.args.cli_args import CLIArgs
 from mrcs_core.data.iso_datetime import ISODatetime
-from mrcs_core.operations.clock import Clock
+from mrcs_core.operations.time.clock import Clock
 
 
 # --------------------------------------------------------------------------------------------------------------------
