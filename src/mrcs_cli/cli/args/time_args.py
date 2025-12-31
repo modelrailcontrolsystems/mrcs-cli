@@ -10,7 +10,7 @@ from collections import OrderedDict
 
 from mrcs_cli.cli.args.cli_args import CLIArgs
 from mrcs_core.data.iso_datetime import ISODatetime
-from mrcs_core.operations.clock import Clock
+from mrcs_core.operations.time.clock import Clock
 
 
 # --------------------------------------------------------------------------------------------------------------------
@@ -45,7 +45,7 @@ class TimeArgs(CLIArgs):
                            help=f'set speed (1 - 10, default 1)')
 
         group.add_argument('-sy', '--year', action='store', type=int, default=now.year,
-                           help=f'set year ({Clock.START_OF_TIME} - default {now.year})')
+                           help=f'set year ({Clock.START_OF_TIME_YEAR} - default {now.year})')
 
         group.add_argument('-sm', '--month', action='store', type=int, default=now.month,
                            help=f'set month (1 - 12, default {now.month})')
