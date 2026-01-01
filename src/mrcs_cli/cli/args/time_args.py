@@ -34,13 +34,16 @@ class TimeArgs(CLIArgs):
                            help='set clock')
 
         group.add_argument('-r', '--restart', action='store_true',
-                           help='restart the clock')
+                           help='(re)start the clock')
 
         group.add_argument('-d', '--delete', action='store_true',
                            help='erase the clock configuration')
 
 
         group = self._parser.add_argument_group()
+        group.add_argument('-sr', '--running', action='store_true',
+                           help=f'start running now')
+
         group.add_argument('-ss', '--speed', action='store', type=int, default=1,
                            help=f'set speed (1 - 10, default 1)')
 
@@ -68,6 +71,7 @@ class TimeArgs(CLIArgs):
     def clock_set(self):
         jdict = OrderedDict()
 
+        jdict['is_running'] = self.set_running
         jdict['speed'] = self.set_speed
 
         jdict['year'] = self.set_year
@@ -109,6 +113,11 @@ class TimeArgs(CLIArgs):
     # ----------------------------------------------------------------------------------------------------------------
 
     @property
+    def set_running(self):
+        return self._args.running
+
+
+    @property
     def set_speed(self):
         return self._args.speed
 
@@ -142,6 +151,6 @@ class TimeArgs(CLIArgs):
 
     def __str__(self, *args, **kwargs):
         return (f'TimeArgs:{{now:{self.now}, conf:{self.conf}, set:{self.set}, restart:{self.restart}, '
-                f'delete:{self.delete}, speed:{self.set_speed}, year:{self.set_year}, '
+                f'delete:{self.delete}, running:{self.set_running},speed:{self.set_speed}, year:{self.set_year}, '
                 f'month:{self.set_month}, day:{self.set_day}, hour:{self.set_hour}, minute:{self.set_minute}, '
                 f'indent:{self.indent}, verbose:{self.verbose}}}')

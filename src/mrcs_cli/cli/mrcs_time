@@ -19,10 +19,10 @@ A 401 response typically indicates that the session token has expired.
 
 SYNOPSIS
 mrcs_time [-h] [-i INDENT] [-v] [--version] (-n | -c | -s | -r | -d)
-[-ss SPEED] [-sy YEAR] [-sm MONTH] [-sd DAY] [-sh HOUR] [-si MINUTE]
+[-sr] [-ss SPEED] [-sy YEAR] [-sm MONTH] [-sd DAY] [-sh HOUR] [-si MINUTE]
 
 EXAMPLES
-mrcs_time -s -ss 4 -sy 1934 -sm 1 -sd 1 -sh 6 -si 0 -v
+mrcs_time -s -sr -ss 4 -sy 1934 -sm 1 -sd 1 -sh 6 -si 0 -v
 mrcs_time -n
 
 SEE ALSO
@@ -93,7 +93,7 @@ if __name__ == '__main__':
             exit(0)
 
         if args.restart:
-            response = httpx.patch(f'{endpoint}/restart', headers=token.as_header())
+            response = httpx.patch(f'{endpoint}/start', headers=token.as_header())
             HTTPResponseException.check(response, 200)
 
             print(JSONify.dumps(response.json()))
