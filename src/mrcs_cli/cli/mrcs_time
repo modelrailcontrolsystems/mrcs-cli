@@ -92,8 +92,8 @@ if __name__ == '__main__':
             print(JSONify.dumps(response.json()))
             exit(0)
 
-        if args.restart:
-            response = httpx.patch(f'{endpoint}/start', headers=token.as_header())
+        if args.reload:
+            response = httpx.patch(f'{endpoint}/reload', headers=token.as_header())
             HTTPResponseException.check(response, 200)
 
             print(JSONify.dumps(response.json()))
@@ -110,9 +110,11 @@ if __name__ == '__main__':
 
     except httpx.ConnectError as ce:
         logger.error(f'{ce} - is the API server running?')
+        exit(1)
 
     except HTTPResponseException as ex:
         logger.error(ex)
+        exit(1)
 
     except KeyboardInterrupt:
         print(file=sys.stderr)

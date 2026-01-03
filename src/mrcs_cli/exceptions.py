@@ -6,6 +6,8 @@ Created on 20 Dec 2025
 HTTPResponse exception handler
 """
 
+import json
+
 from httpx import Response
 
 
@@ -24,14 +26,16 @@ class HTTPResponseException(RuntimeError):
 
     @classmethod
     def construct(cls, response: Response):
-        return cls(response.status_code, response.reason_phrase)
+        content = json.loads(response.content)
+        return cls(response.status_code, response.reason_phrase, content.get('detail'))
 
 
     # ----------------------------------------------------------------------------------------------------------------
 
-    def __init__(self, status_code: int, reason_phrase: str):
+    def __init__(self, status_code: int, reason_phrase: str, detail: str | None):
         self.__status_code = status_code
         self.__reason_phrase = reason_phrase
+        self.__detail = detail
 
 
     # ----------------------------------------------------------------------------------------------------------------
@@ -46,9 +50,15 @@ class HTTPResponseException(RuntimeError):
         return self.__reason_phrase
 
 
+    @property
+    def detail(self):
+        return self.__detail
+
+
     # ----------------------------------------------------------------------------------------------------------------
 
     def __str__(self, *args, **kwargs):
-        return f'HTTPResponse: {self.status_code}: {self.reason_phrase}'
+        detail = '' if self.detail is None else f': {self.detail}'
+        return f'HTTPResponse: {self.status_code}: {self.reason_phrase}{detail}'
 
 
