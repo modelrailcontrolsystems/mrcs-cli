@@ -9,6 +9,7 @@ https://realpython.com/command-line-interfaces-python-argparse/
 from collections import OrderedDict
 
 from mrcs_cli.cli.args.cli_args import CLIArgs
+
 from mrcs_core.data.iso_datetime import ISODatetime
 from mrcs_core.operations.time.clock import Clock
 
@@ -33,8 +34,8 @@ class TimeArgs(CLIArgs):
         group.add_argument('-s', '--set', action='store_true',
                            help='set clock')
 
-        group.add_argument('-r', '--restart', action='store_true',
-                           help='(re)start the clock')
+        group.add_argument('-r', '--reload', action='store_true',
+                           help='load the clock from saved model time')
 
         group.add_argument('-d', '--delete', action='store_true',
                            help='erase the clock configuration')
@@ -42,7 +43,7 @@ class TimeArgs(CLIArgs):
 
         group = self._parser.add_argument_group()
         group.add_argument('-sr', '--running', action='store_true',
-                           help=f'start running now')
+                           help=f'start running when set')
 
         group.add_argument('-ss', '--speed', action='store', type=int, default=1,
                            help=f'set speed (1 - 10, default 1)')
@@ -101,8 +102,8 @@ class TimeArgs(CLIArgs):
 
 
     @property
-    def restart(self):
-        return self._args.restart
+    def reload(self):
+        return self._args.reload
 
 
     @property
@@ -150,7 +151,7 @@ class TimeArgs(CLIArgs):
     # ----------------------------------------------------------------------------------------------------------------
 
     def __str__(self, *args, **kwargs):
-        return (f'TimeArgs:{{now:{self.now}, conf:{self.conf}, set:{self.set}, restart:{self.restart}, '
+        return (f'TimeArgs:{{now:{self.now}, conf:{self.conf}, set:{self.set}, reload:{self.reload}, '
                 f'delete:{self.delete}, running:{self.set_running},speed:{self.set_speed}, year:{self.set_year}, '
                 f'month:{self.set_month}, day:{self.set_day}, hour:{self.set_hour}, minute:{self.set_minute}, '
                 f'indent:{self.indent}, verbose:{self.verbose}}}')
