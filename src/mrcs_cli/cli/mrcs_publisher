@@ -20,7 +20,7 @@ mrcs_publisher [-h] [-i INDENT] [-v] [--version] [-s SOURCE_SERIAL]
 [-t TARGET_TYPE] [-b TARGET_BLOCK] [-n TARGET_SERIAL] [-m MESSAGE_BODY]
 
 EXAMPLES
-mrcs_publisher -v -t MPU -b 1 -n 2
+mrcs_publisher -v -t OMP -b 1 -n 2
 
 SEE ALSO
 mrcs_session
