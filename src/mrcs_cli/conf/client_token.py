@@ -30,7 +30,7 @@ class ClientJWT(JWT, PersistentJSONable):
     # ----------------------------------------------------------------------------------------------------------------
 
     @classmethod
-    def construct_from_jdict(cls, jdict, skeleton=False):
+    def construct_from_jdict(cls, jdict):
         if not jdict:
             return None
 
