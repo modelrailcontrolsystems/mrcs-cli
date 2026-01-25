@@ -91,8 +91,6 @@ if __name__ == '__main__':
         logger.error('security token not set - use mrcs_session to create one.')
         exit(1)
 
-    # TODO: test whether the given target type is a valid EquipmentIdentity (should be Enum)
-
     try:
         target = EquipmentFilter.construct(args.target_type, args.target_block, args.target_serial)
     except ValueError as ve:
