@@ -14,6 +14,17 @@ A tool for managing model time.
 * Deleting the clock configuration will return the clock to natural time
 The timezone of model time is the same timezone as the host processor.
 
+Similar functionality is available from the mrcs_control/mrcs_clock utility. To clarify:
+
+mrcs_cli/mrcs_time
+* Intended for use when the system is running
+* Mimics the functionality of the Web UI
+* Requires the API server and mrcs_control/mrcs_clock_manager to be running in order to operate
+
+mrcs_control/mrcs_clock
+* Intended for use during system startup under systemd control
+* Requires the mrcs_control/mrcs_clock_manager to be running in order to operate
+
 A session must have been established with the API server, using the mrcs_session utility.
 A 401 response typically indicates that the session token has expired.
 
@@ -27,6 +38,7 @@ mrcs_time -n
 
 SEE ALSO
 mrcs_session
+mrcs_control/mrcs_clock
 """
 
 import httpx
@@ -42,7 +54,6 @@ from mrcs_core.sys.host import Host
 from mrcs_core.sys.logging import Logging
 
 
-# TODO: add a mrcs_time utility to mrcs_control/cli?
 # --------------------------------------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
