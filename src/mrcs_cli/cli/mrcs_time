@@ -84,7 +84,7 @@ if __name__ == '__main__':
 
     try:
         if args.now:
-            response = httpx.get(f'{endpoint}/now')
+            response = httpx.get(f'{endpoint}/now')     # TODO: timeout is too short
             HTTPResponseException.check(response, 200)
 
             print(JSONify.dumps(response.json()))

@@ -8,6 +8,7 @@ HTTPResponse exception handler
 
 import json
 
+from json import JSONDecodeError
 from httpx import Response
 
 
@@ -26,8 +27,12 @@ class HTTPResponseException(RuntimeError):
 
     @classmethod
     def construct(cls, response: Response):
-        content = json.loads(response.content)
-        return cls(response.status_code, response.reason_phrase, content.get('detail'))
+        try:
+            detail = json.loads(response.content).get('detail')
+        except JSONDecodeError:
+            detail = None
+
+        return cls(response.status_code, response.reason_phrase, detail)
 
 
     # ----------------------------------------------------------------------------------------------------------------
