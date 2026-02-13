@@ -41,14 +41,14 @@ mrcs_session
 mrcs_control/mrcs_clock
 """
 
-import httpx
 import sys
+
+import httpx
 
 from mrcs_cli.cli.args.time_args import TimeArgs
 from mrcs_cli.conf.client_token import ClientJWT
 from mrcs_cli.conf.server import Server
 from mrcs_cli.exceptions import HTTPResponseException
-
 from mrcs_core.data.json import JSONify
 from mrcs_core.sys.host import Host
 from mrcs_core.sys.logging import Logging
@@ -84,7 +84,7 @@ if __name__ == '__main__':
 
     try:
         if args.now:
-            response = httpx.get(f'{endpoint}/now')     # TODO: timeout is too short
+            response = httpx.get(f'{endpoint}/now')
             HTTPResponseException.check(response, 200)
 
             print(JSONify.dumps(response.json()))

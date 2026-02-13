@@ -10,25 +10,26 @@ source repo: mrcs_cli
 DESCRIPTION
 A tool for managing security tokens for MRCS API sessions.
 A username (email address) can be set for use in creating sessions.
-The password must be given interactively when the session is created.
+The password should normally be given interactively when the session is created. An option that hard-codes the email
+and password is included for end-to-end testing.
 
 SYNOPSIS
-mrcs_session [-h] [-i INDENT] [-v] [--version] (-s SET_EMAIL | -e | -c | -d)
+usage: mrcs_session [-h] [-i INDENT] [-v] [--version] (-s SET_EMAIL | -e | -n | -c EMAIL PASSWORD | -d)
 
 EXAMPLES
 mrcs_session -s bbeloff1@me.com
-mrcs_session -c
+mrcs_session -i
 """
 
-import httpx
 import sys
+
+import httpx
 
 from mrcs_cli.cli.args.session_args import SessionArgs
 from mrcs_cli.conf.client_token import ClientJWT
 from mrcs_cli.conf.credentials import Credentials
 from mrcs_cli.conf.server import Server
 from mrcs_cli.exceptions import HTTPResponseException
-
 from mrcs_core.data.datum import Datum
 from mrcs_core.sys.host import Host
 from mrcs_core.sys.logging import Logging
@@ -38,6 +39,9 @@ from mrcs_core.sys.stdio import StdIO
 # --------------------------------------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
+
+    username = None
+    password = None
 
     # ----------------------------------------------------------------------------------------------------------------
 
@@ -72,13 +76,17 @@ if __name__ == '__main__':
             Credentials.delete(Host)
             exit(0)
 
-        if args.create_session:
+        if args.credentials:
+            username = args.email
+            password = args.password
+
+        if args.interactive:
             credentials = Credentials.load(Host)
             username = credentials.username if credentials else None
-
             username = StdIO.prompt('username', default=username)
             password = StdIO.password('password')
 
+        if args.create_session:
             form = Credentials(username, password).as_form()
 
             try:
