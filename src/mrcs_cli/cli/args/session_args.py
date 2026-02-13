@@ -25,8 +25,11 @@ class SessionArgs(CLIArgs):
         group.add_argument('-e', '--erase-email', action='store_true',
                            help='erase the stored email address')
 
-        group.add_argument('-c', '--create-session', action='store_true',
-                           help='create a new API session')
+        group.add_argument('-n', '--interactive', action='store_true',
+                           help='create a new API session interactively (SAFE)')
+
+        group.add_argument('-c', '--credentials', action='store', type=str, nargs=2,
+                           help='create a new API session with EMAIL PASSWORD (TEST ONLY)')
 
         group.add_argument('-d', '--delete-session', action='store_true',
                            help='delete the current API session')
@@ -48,7 +51,27 @@ class SessionArgs(CLIArgs):
 
     @property
     def create_session(self):
-        return self._args.create_session
+        return self._args.interactive or self.credentials
+
+
+    @property
+    def interactive(self):
+        return self._args.interactive
+
+
+    @property
+    def credentials(self):
+        return bool(self._args.credentials)
+
+
+    @property
+    def email(self):
+        return self._args.credentials[0] if self.credentials else None
+
+
+    @property
+    def password(self):
+        return self._args.credentials[1] if self.credentials else None
 
 
     @property
@@ -60,5 +83,6 @@ class SessionArgs(CLIArgs):
 
     def __str__(self, *args, **kwargs):
         return (f'SessionArgs:{{set_email:{self.set_email}, erase_email:{self.erase_email}, '
-                f'create:{self.create_session}, delete:{self.delete_session}, '
+                f'interactive:{self.interactive}, '
+                f'credentials:{self._args.credentials}, delete:{self.delete_session}, '
                 f'indent:{self.indent}, verbose:{self.verbose}}}')
