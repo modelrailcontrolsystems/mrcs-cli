@@ -19,6 +19,10 @@ usage: mrcs_session [-h] [-i INDENT] [-v] [--version] (-s SET_EMAIL | -e | -n | 
 EXAMPLES
 mrcs_session -s bbeloff1@me.com
 mrcs_session -i
+
+FILES
+~/MRCS/conf/credentials.json
+~/MRCS/conf/token.json
 """
 
 import sys
@@ -28,11 +32,11 @@ import httpx
 from mrcs_cli.cli.args.session_args import SessionArgs
 from mrcs_cli.conf.client_token import ClientJWT
 from mrcs_cli.conf.credentials import Credentials
-from mrcs_cli.conf.server import Server
 from mrcs_cli.exceptions import HTTPResponseException
 from mrcs_core.data.datum import Datum
 from mrcs_core.sys.host import Host
 from mrcs_core.sys.logging import Logging
+from mrcs_core.sys.server import Server
 from mrcs_core.sys.stdio import StdIO
 
 
@@ -51,13 +55,13 @@ if __name__ == '__main__':
     logger = Logging.getLogger()
     logger.info(f'args: {args}')
 
-    server = Server.load(Host)
+    server = Server.load(Host, name='api')
 
     if not server:
         logger.error('server not configured.')
         exit(1)
 
-    endpoint = server.url('session')
+    endpoint = server.url(path='/session')
     logger.info(f'endpoint: {endpoint}')
 
     # ----------------------------------------------------------------------------------------------------------------

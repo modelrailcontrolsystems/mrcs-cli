@@ -8,41 +8,44 @@ Created on 6 Dec 2025
 source repo: mrcs_cli
 
 DESCRIPTION
-Configure the MRCS local web server base URL
+Configure the CLI client for the MRCS API server base URL. Required for correct functioning of the CLI utilities.
 
 SYNOPSIS
-mrcs_server [-h] [-i INDENT] [-v] [--version] [-s HOST PORT IS_SECURE]
+mrcs_api_server [-h] [-i INDENT] [-v] [--version] [-s HOST PORT IS_SECURE]
 
 EXAMPLES
-mrcs_server -v -i4 -s 127.0.0.1 8080 0
+mrcs_api_server -v -i4 -s localhost 8000 0
 
 DOCUMENT EXAMPLE
 {
-    "host": "127.0.0.1",
+    "host": "localhost",
     "port": 8000,
     "is_secure": false
 }
+
+FILES
+~/MRCS/conf/api_server.json
 """
 
 from mrcs_cli.cli.args.server_args import ServerArgs
-from mrcs_cli.conf.server import Server
-
 from mrcs_core.data.json import JSONify
 from mrcs_core.sys.host import Host
 from mrcs_core.sys.logging import Logging
+from mrcs_core.sys.server import Server
 
 
 # --------------------------------------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
 
+    name = 'api'
     publisher = None
 
     # ----------------------------------------------------------------------------------------------------------------
 
-    args = ServerArgs('configure the MRCS local web server base URL')
+    args = ServerArgs('configure the CLI client for the MRCS API server base URL')
 
-    Logging.config('mrcs_server', verbose=args.verbose)
+    Logging.config('mrcs_api_server', verbose=args.verbose)
     logger = Logging.getLogger()
     logger.info(f'args: {args}')
 
@@ -53,8 +56,8 @@ if __name__ == '__main__':
     # ----------------------------------------------------------------------------------------------------------------
 
     if args.do_set:
-        server = Server(args.host, args.port, args.is_secure)
+        server = Server(args.host, args.port, args.is_secure, name=name)
         server.save(Host)
 
-    server = Server.load(Host)
+    server = Server.load(Host, name=name)
     print(JSONify.dumps(server, indent=args.indent))
