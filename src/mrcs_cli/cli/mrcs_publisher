@@ -26,24 +26,23 @@ SEE ALSO
 mrcs_session
 """
 
-import httpx
 import json
 import sys
-
 from json import JSONDecodeError
+
+import httpx
 
 from mrcs_cli.cli.args.publisher_args import PublisherArgs
 from mrcs_cli.conf.client_token import ClientJWT
-from mrcs_cli.conf.server import Server
 from mrcs_cli.exceptions import HTTPResponseException
-
 from mrcs_core.data.datum import Datum
-from mrcs_core.data.equipment_identity import EquipmentType, EquipmentIdentifier, EquipmentFilter
+from mrcs_core.data.equipment_identity import EquipmentFilter, EquipmentIdentifier, EquipmentType
 from mrcs_core.data.json import JSONify
 from mrcs_core.messaging.message import Message
 from mrcs_core.messaging.routing_key import PublicationRoutingKey
 from mrcs_core.sys.host import Host
 from mrcs_core.sys.logging import Logging
+from mrcs_core.sys.server import Server
 
 
 # --------------------------------------------------------------------------------------------------------------------
@@ -78,12 +77,12 @@ if __name__ == '__main__':
     logger = Logging.getLogger()
     logger.info(f'args: {args}')
 
-    server = Server.load(Host)
+    server = Server.load(Host, name='api')
     if not server:
         logger.error('server not configured.')
         exit(1)
 
-    endpoint = server.url('tst/publish')
+    endpoint = server.url(path='/tst/publish')
     logger.info(f'endpoint: {endpoint}')
 
     token = ClientJWT.load(Host)

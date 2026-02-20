@@ -47,11 +47,11 @@ import httpx
 
 from mrcs_cli.cli.args.time_args import TimeArgs
 from mrcs_cli.conf.client_token import ClientJWT
-from mrcs_cli.conf.server import Server
 from mrcs_cli.exceptions import HTTPResponseException
 from mrcs_core.data.json import JSONify
 from mrcs_core.sys.host import Host
 from mrcs_core.sys.logging import Logging
+from mrcs_core.sys.server import Server
 
 
 # --------------------------------------------------------------------------------------------------------------------
@@ -66,13 +66,13 @@ if __name__ == '__main__':
     logger = Logging.getLogger()
     logger.info(f'args: {args}')
 
-    server = Server.load(Host)
+    server = Server.load(Host, name='api')
 
     if not server:
         logger.error('server not configured.')
         exit(1)
 
-    endpoint = server.url('time')
+    endpoint = server.url(path='/time')
     logger.info(f'endpoint: {endpoint}')
 
     token = ClientJWT.load(Host)
