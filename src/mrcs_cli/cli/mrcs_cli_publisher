@@ -16,11 +16,11 @@ A session must have been established with the API server, using the mrcs_session
 A 401 response typically indicates that the session token has expired.
 
 SYNOPSIS
-mrcs_publisher [-h] [-i INDENT] [-v] [--version] [-s SOURCE_SERIAL]
+mrcs_cli_publisher [-h] [-i INDENT] [-v] [--version] [-s SOURCE_SERIAL]
 [-t TARGET_TYPE] [-b TARGET_BLOCK] [-n TARGET_SERIAL] [-m MESSAGE_BODY]
 
 EXAMPLES
-mrcs_publisher -vti4 -t CRN -m '{"event_id": "abc", "on": "1930-01-12T13:10:00.000"}'
+mrcs_cli_publisher -vti4 -t CRN -m '{"event_id": "abc", "on": "1930-01-12T13:10:00.000"}'
 
 SEE ALSO
 mrcs_session
@@ -71,9 +71,9 @@ if __name__ == '__main__':
 
     # ----------------------------------------------------------------------------------------------------------------
 
-    args = PublisherArgs('a tool for publishing messages via the MRCS API')
+    args = PublisherArgs('a tool for publishing messages using the MRCS API')
 
-    Logging.config('mrcs_publisher', verbose=args.verbose)
+    Logging.config('mrcs_cli_publisher', verbose=args.verbose)
     logger = Logging.getLogger()
     logger.info(f'args: {args}')
 
