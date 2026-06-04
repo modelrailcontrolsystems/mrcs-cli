@@ -8,16 +8,16 @@ Created on 20 Dec 2025
 source repo: mrcs_cli
 
 DESCRIPTION
-A tool for listing the latest N logged messages via the MRCS API.
+A tool for managing users via the MRCS API.
 
 A session must have been established with the API server, using the mrcs_session utility.
 A 401 response typically indicates that the session token has expired.
 
 SYNOPSIS
-mrcs_messages [-h] [-i INDENT] [-v] [--version] -l LIST
+mrcs_cli_users [-h] [-i INDENT] [-v] [--version] (-s | -l | -d DELETE)
 
 EXAMPLES
-mrcs_messages -vi4 -l 10
+mrcs_cli_users -v -l -i4
 
 SEE ALSO
 mrcs_session
@@ -27,11 +27,11 @@ import sys
 
 import httpx
 
-from mrcs_cli.cli.args.messages_args import MessagesArgs
+from mrcs_cli.cli.args.users_args import UsersArgs
 from mrcs_cli.conf.client_token import ClientJWT
 from mrcs_cli.exceptions import HTTPResponseException
+from mrcs_core.admin.user.user import User
 from mrcs_core.data.json import JSONify
-from mrcs_core.operations.recorder.message_record import MessageRecord
 from mrcs_core.sys.host import Host
 from mrcs_core.sys.logging import Logging
 from mrcs_core.sys.server import Server
@@ -43,9 +43,9 @@ if __name__ == '__main__':
 
     # ----------------------------------------------------------------------------------------------------------------
 
-    args = MessagesArgs('a tool for listing logged messages via the MRCS API')
+    args = UsersArgs('a tool for managing users via the MRCS API')
 
-    Logging.config('mrcs_messages', verbose=args.verbose)
+    Logging.config('mrcs_cli_users', verbose=args.verbose)
     logger = Logging.getLogger()
     logger.info(f'args: {args}')
 
@@ -54,7 +54,7 @@ if __name__ == '__main__':
         logger.error('server not configured.')
         exit(1)
 
-    endpoint = server.url(path='/mlg')
+    endpoint = server.url(path='/user')
     logger.info(f'endpoint: {endpoint}')
 
     token = ClientJWT.load(Host)
@@ -65,16 +65,35 @@ if __name__ == '__main__':
     # ----------------------------------------------------------------------------------------------------------------
 
     try:
-        response = httpx.get(f'{endpoint}/latest', headers=token.as_header(), params={"limit": args.list})
-        HTTPResponseException.check(response, 200)
+        if args.self:
+            response = httpx.get(f'{endpoint}/self', headers=token.as_header())
+            HTTPResponseException.check(response, 200)
 
-        users = [MessageRecord.construct_from_jdict(jdict) for jdict in response.json()]
-        print(JSONify.dumps(users, indent=args.indent))
+            user = User.construct_from_jdict(response.json())
+            print(JSONify.dumps(user, indent=args.indent))
+            exit(0)
+
+        if args.list:
+            response = httpx.get(f'{endpoint}/find_all', headers=token.as_header())
+            HTTPResponseException.check(response, 200)
+
+            users = [User.construct_from_jdict(jdict) for jdict in response.json()]
+            print(JSONify.dumps(users, indent=args.indent))
+            exit(0)
+
+        if args.delete:
+            response = httpx.delete(f'{endpoint}/delete/{args.delete}', headers=token.as_header())
+            HTTPResponseException.check(response, 200)
+            exit(0)
 
     # ----------------------------------------------------------------------------------------------------------------
 
     except httpx.ConnectError as ce:
         logger.error(f'{ce} - is the API server running?')
+        exit(1)
+
+    except HTTPResponseException as ex:
+        logger.error(ex)
         exit(1)
 
     except KeyboardInterrupt:

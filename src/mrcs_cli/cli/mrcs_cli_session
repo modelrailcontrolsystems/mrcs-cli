@@ -14,11 +14,11 @@ The password should normally be given interactively when the session is created.
 and password is included for end-to-end testing.
 
 SYNOPSIS
-usage: mrcs_session [-h] [-i INDENT] [-v] [--version] (-s SET_EMAIL | -e | -n | -c EMAIL PASSWORD | -d)
+usage: mrcs_cli_session [-h] [-i INDENT] [-v] [--version] (-s SET_EMAIL | -e | -n | -c EMAIL PASSWORD | -d)
 
 EXAMPLES
-mrcs_session -s bbeloff1@me.com
-mrcs_session -i
+mrcs_cli_session -s bbeloff1@me.com
+mrcs_cli_session -i
 
 FILES
 ~/MRCS/conf/credentials.json
@@ -44,14 +44,14 @@ from mrcs_core.sys.stdio import StdIO
 
 if __name__ == '__main__':
 
-    username = None
-    password = None
+    username = ''
+    password = ''
 
     # ----------------------------------------------------------------------------------------------------------------
 
     args = SessionArgs('a tool for managing security tokens for MRCS API sessions')
 
-    Logging.config('mrcs_session', verbose=args.verbose)
+    Logging.config('mrcs_cli_session', verbose=args.verbose)
     logger = Logging.getLogger()
     logger.info(f'args: {args}')
 
@@ -86,8 +86,8 @@ if __name__ == '__main__':
 
         if args.interactive:
             credentials = Credentials.load(Host)
-            username = credentials.username if credentials else None
-            username = StdIO.prompt('username', default=username)
+            default_username = credentials.username if credentials else None
+            username = StdIO.prompt('username', default=default_username)
             password = StdIO.password('password')
 
         if args.create_session:
