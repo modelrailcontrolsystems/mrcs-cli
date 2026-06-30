@@ -6,9 +6,7 @@ Created on 18 Dec 2025
 The MRCS local web server base URL configuration
 
 {
-    "username": "127.0.0.1",
-    "password": 8000,
-    "is_secure": false
+    "username": "bbeloff1@me.com"
 }
 
 https://en.wikipedia.org/wiki/URL
@@ -27,6 +25,7 @@ class Credentials(PersistentJSONable):
     """
 
     __FILENAME = "credentials.json"
+
 
     @classmethod
     def persistence_location(cls):
