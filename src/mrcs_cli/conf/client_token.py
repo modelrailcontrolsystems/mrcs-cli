@@ -9,7 +9,6 @@ A JSON Web Token (JWT) carrying scopes
 from collections import OrderedDict
 
 from mrcs_core.data.json import PersistentJSONable
-
 from mrcs_core.security.token import AccessToken, JWT
 
 
@@ -21,6 +20,7 @@ class ClientJWT(JWT, PersistentJSONable):
     """
 
     __FILENAME = "token.json"
+
 
     @classmethod
     def persistence_location(cls):
@@ -39,6 +39,7 @@ class ClientJWT(JWT, PersistentJSONable):
 
         return cls(access, token_type)
 
+
     # ----------------------------------------------------------------------------------------------------------------
 
     def __init__(self, access: AccessToken, token_type: str = JWT.TOKEN_TYPE):
@@ -47,7 +48,7 @@ class ClientJWT(JWT, PersistentJSONable):
 
     # ----------------------------------------------------------------------------------------------------------------
 
-    def as_json(self, expiry=None):
+    def as_json(self, **kwargs):
         jdict = OrderedDict()
 
         jdict['access_token'] = self.access.data
