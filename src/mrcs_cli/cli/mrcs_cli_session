@@ -104,8 +104,8 @@ if __name__ == '__main__':
             except httpx.ConnectError as ce:
                 logger.error(f'{ce} - is the API server running?')
 
-            except Exception as ex:
-                logger.error(f'{ex.__class__.__name__}: {ex}')
+            except Exception as exc:
+                logger.error(f'{exc.__class__.__name__}: {exc}')
                 exit(1)
 
         if args.delete_session:

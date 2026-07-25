@@ -60,8 +60,8 @@ def publish_message(body):
         response = httpx.post(endpoint, headers=token.as_header(), json=JSONify.as_jdict(message))
         HTTPResponseException.check(response, 201)
 
-    except HTTPResponseException as ex:
-        logger.error(ex)
+    except HTTPResponseException as exc:
+        logger.error(exc)
         exit(1)
 
 
