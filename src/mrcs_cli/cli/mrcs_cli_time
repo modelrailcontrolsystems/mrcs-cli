@@ -124,8 +124,8 @@ if __name__ == '__main__':
         logger.error(f'{ce} - is the API server running?')
         exit(1)
 
-    except HTTPResponseException as ex:
-        logger.error(ex)
+    except HTTPResponseException as exc:
+        logger.error(exc)
         exit(1)
 
     except KeyboardInterrupt:
