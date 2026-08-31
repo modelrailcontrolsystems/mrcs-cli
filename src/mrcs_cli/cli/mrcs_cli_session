@@ -14,7 +14,7 @@ The password should normally be given interactively when the session is created.
 and password is included for end-to-end testing.
 
 SYNOPSIS
-usage: mrcs_cli_session [-h] [-i INDENT] [-v] [--version] (-s SET_EMAIL | -e | -n | -c EMAIL PASSWORD | -d)
+usage: mrcs_cli_session [-h] [-i INDENT] [-v] [--version] (-s EMAIL | -e | -n | -c EMAIL PASSWORD | -d)
 
 EXAMPLES
 mrcs_cli_session -s bbeloff1@me.com

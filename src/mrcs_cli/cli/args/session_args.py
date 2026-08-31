@@ -19,7 +19,7 @@ class SessionArgs(CLIArgs):
         super().__init__(description)
 
         group = self._parser.add_mutually_exclusive_group(required=True)
-        group.add_argument('-s', '--set-email', action='store', type=str,
+        group.add_argument('-s', '--set-email', action='store', type=str, metavar=('EMAIL',),
                            help='store the given email address')
 
         group.add_argument('-e', '--erase-email', action='store_true',
@@ -28,7 +28,7 @@ class SessionArgs(CLIArgs):
         group.add_argument('-n', '--interactive', action='store_true',
                            help='create a new API session interactively (SAFE)')
 
-        group.add_argument('-c', '--credentials', action='store', type=str, nargs=2,
+        group.add_argument('-c', '--credentials', action='store', type=str, nargs=2, metavar=('EMAIL', 'PASSWORD'),
                            help='create a new API session with EMAIL PASSWORD (TEST ONLY)')
 
         group.add_argument('-d', '--delete-session', action='store_true',
