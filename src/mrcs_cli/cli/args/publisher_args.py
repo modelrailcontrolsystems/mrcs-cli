@@ -6,13 +6,14 @@ Created on 22 Nov 2025
 https://realpython.com/command-line-interfaces-python-argparse/
 """
 
-from mrcs_cli.cli.args.cli_args import CLIArgs
+from mrcs_core.cli.args.common_args import CommonArgs
 
 
 # --------------------------------------------------------------------------------------------------------------------
 
-class PublisherArgs(CLIArgs):
+class PublisherArgs(CommonArgs):
     """unix command line handler"""
+
 
     def __init__(self, description):
         super().__init__(description)

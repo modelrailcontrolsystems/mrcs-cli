@@ -8,16 +8,16 @@ https://realpython.com/command-line-interfaces-python-argparse/
 
 from collections import OrderedDict
 
-from mrcs_cli.cli.args.cli_args import CLIArgs
-
+from mrcs_core.cli.args.common_args import CommonArgs
 from mrcs_core.data.iso_datetime import ISODatetime
 from mrcs_core.operations.time.clock import Clock
 
 
 # --------------------------------------------------------------------------------------------------------------------
 
-class TimeArgs(CLIArgs):
+class TimeArgs(CommonArgs):
     """unix command line handler"""
+
 
     def __init__(self, description):
         super().__init__(description)
@@ -40,7 +40,6 @@ class TimeArgs(CLIArgs):
         group.add_argument('-d', '--delete', action='store_true',
                            help='erase the clock configuration')
 
-
         group = self._parser.add_argument_group()
         group.add_argument('-sr', '--running', action='store_true',
                            help=f'start running when set')
@@ -62,7 +61,6 @@ class TimeArgs(CLIArgs):
 
         group.add_argument('-si', '--minute', action='store', type=int, default=0,
                            help='set minute (0 - 59, default 0)')
-
 
         self._args = self._parser.parse_args()
 
