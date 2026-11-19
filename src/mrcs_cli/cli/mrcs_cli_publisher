@@ -36,9 +36,9 @@ from mrcs_cli.cli.args.publisher_args import PublisherArgs
 from mrcs_cli.conf.client_token import ClientJWT
 from mrcs_cli.exceptions import HTTPResponseException
 from mrcs_core.data.datum import Datum
+from mrcs_core.data.json import JSONify
 from mrcs_core.equipment.equipment_enums import EquipmentType
 from mrcs_core.equipment.equipment_identity import EquipmentFilter, EquipmentIdentifier
-from mrcs_core.data.json import JSONify
 from mrcs_core.messaging.message import Message
 from mrcs_core.messaging.routing_key import PublicationRoutingKey
 from mrcs_core.sys.host import Host
@@ -100,7 +100,7 @@ if __name__ == '__main__':
     # ----------------------------------------------------------------------------------------------------------------
 
     try:
-        source = EquipmentIdentifier(EquipmentType.TST, None, args.source_serial)
+        source = EquipmentIdentifier(EquipmentType.CLU, None, args.source_serial)
         routing_key = PublicationRoutingKey(source, target)
 
         if args.message_body:
